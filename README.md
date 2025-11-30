@@ -218,4 +218,3 @@ tests/
 ---
 
 **Built with Laravel Framework**
-**Generated with Claude Code** 🤖
