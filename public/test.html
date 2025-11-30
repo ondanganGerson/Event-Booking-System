@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Booking API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .endpoint { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 3px; }
+        button:hover { background: #45a049; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Event Booking System API Test</h1>
+
+    <div class="endpoint">
+        <h3>1. Register User</h3>
+        <button onclick="register()">Test Register</button>
+        <pre id="register-result"></pre>
+    </div>
+
+    <div class="endpoint">
+        <h3>2. Get Events</h3>
+        <button onclick="getEvents()">Test Get Events</button>
+        <pre id="events-result"></pre>
+    </div>
+
+    <div class="endpoint">
+        <h3>3. Login</h3>
+        <button onclick="login()">Test Login</button>
+        <pre id="login-result"></pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+
+        async function register() {
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: 'test' + Date.now() + '@example.com',
+                        password: 'password123',
+                        password_confirmation: 'password123',
+                        phone: '1234567890',
+                        role: 'customer'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('register-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('register-result').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function getEvents() {
+            try {
+                const response = await fetch(`${API_URL}/events`);
+                const data = await response.json();
+                document.getElementById('events-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('events-result').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function login() {
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'customer1@example.com',
+                        password: 'password'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('login-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('login-result').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
