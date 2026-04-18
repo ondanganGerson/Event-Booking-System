@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Booking System API Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4f8cff;
+            --primary-dark: #2c5db6;
+            --bg: #f4f7fa;
+            --card-bg: #fff;
+            --border: #e0e6ed;
+            --text: #222;
+            --muted: #888;
+            --success: #e6ffed;
+            --error: #ffeaea;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+        }
+        .navbar {
+            background: var(--primary);
+            color: #fff;
+            padding: 18px 32px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .container {
+            max-width: 900px;
+            margin: 32px auto 0 auto;
+            padding: 0 16px 32px 16px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5em;
+        }
+        h2 {
+            margin-top: 32px;
+            color: var(--primary-dark);
+            font-size: 1.3rem;
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            padding: 24px 20px 16px 20px;
+            margin-bottom: 28px;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(79,140,255,0.08);
+        }
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            margin-top: 4px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #fafdff;
+            transition: border 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border: 1.5px solid var(--primary);
+            outline: none;
+        }
+        button {
+            margin-top: 16px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 22px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: var(--primary-dark);
+        }
+        .response {
+            background: #fafdff;
+            border: 1px solid var(--border);
+            padding: 12px;
+            margin-top: 14px;
+            border-radius: 6px;
+            font-size: 0.97rem;
+            color: var(--muted);
+            min-height: 24px;
+            max-height: 250px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+        .section-title {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+        }
+        .token-bar {
+            background: #fafdff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin: 24px 0 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .token-bar label {
+            margin: 0;
+            font-weight: 400;
+        }
+        .token-bar input {
+            width: 60%;
+            margin: 0 8px 0 0;
+        }
+        .token-bar button {
+            margin: 0;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 0 4px; }
+            .card { padding: 14px 6px 10px 6px; }
+            .token-bar { flex-direction: column; align-items: stretch; }
+            .token-bar input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">Event Booking System API Demo</div>
+    <div class="container">
+        <div class="card" id="auth-section">
+            <h2>Authentication</h2>
+            <form id="register-form">
+                <div class="section-title">Register</div>
+                <label>Email: <input type="email" name="email" required></label>
+                <label>Password: <input type="password" name="password" required></label>
+                <label>Name: <input type="text" name="name" required></label>
+                <button type="submit">Register</button>
+                <div class="response" id="register-response"></div>
+            </form>
+            <form id="login-form">
+                <div class="section-title">Login</div>
+                <label>Email: <input type="email" name="email" required></label>
+                <label>Password: <input type="password" name="password" required></label>
+                <button type="submit">Login</button>
+                <div class="response" id="login-response"></div>
+            </form>
+            <form id="logout-form">
+                <div class="section-title">Logout</div>
+                <button type="submit">Logout</button>
+                <div class="response" id="logout-response"></div>
+            </form>
+            <!-- <form id="me-form">
+                <div class="section-title">Get My Profile</div>
+                <button type="submit">Get Profile</button>
+                <div class="response" id="me-response"></div>
+            </form> -->
+        </div>
+        <div class="card" id="event-section">
+            <h2>Events</h2>
+            <form id="get-events-form">
+                <div class="section-title">Get All Events</div>
+                <button type="submit">Fetch Events</button>
+                <div class="response" id="get-events-response"></div>
+            </form>
+            <form id="get-event-form">
+                <div class="section-title">Get Event by ID</div>
+                <label>Event ID: <input type="number" name="id" required></label>
+                <button type="submit">Fetch Event</button>
+                <div class="response" id="get-event-response"></div>
+            </form>
+            <form id="create-event-form">
+                <div class="section-title">Create Event (Organizer/Admin)</div>
+                <label>Title: <input type="text" name="title" required></label>
+                <label>Description: <input type="text" name="description"></label>
+                <label>Date: <input type="date" name="date"></label>
+                <button type="submit">Create Event</button>
+                <div class="response" id="create-event-response"></div>
+            </form>
+            <form id="update-event-form">
+                <div class="section-title">Update Event (Organizer/Admin)</div>
+                <label>Event ID: <input type="number" name="id" required></label>
+                <label>Title: <input type="text" name="title"></label>
+                <label>Description: <input type="text" name="description"></label>
+                <label>Date: <input type="date" name="date"></label>
+                <button type="submit">Update Event</button>
+                <div class="response" id="update-event-response"></div>
+            </form>
+            <form id="delete-event-form">
+                <div class="section-title">Delete Event (Organizer/Admin)</div>
+                <label>Event ID: <input type="number" name="id" required></label>
+                <button type="submit">Delete Event</button>
+                <div class="response" id="delete-event-response"></div>
+            </form>
+        </div>
+        <div class="card" id="ticket-section">
+            <h2>Tickets (Organizer/Admin)</h2>
+            <form id="create-ticket-form">
+                <div class="section-title">Create Ticket</div>
+                <label>Event ID: <input type="number" name="event_id" required></label>
+                <label>Type: <input type="text" name="type" required></label>
+                <label>Price: <input type="number" name="price" required></label>
+                <label>Quantity: <input type="number" name="quantity" required></label>
+                <button type="submit">Create Ticket</button>
+                <div class="response" id="create-ticket-response"></div>
+            </form>
+            <form id="update-ticket-form">
+                <div class="section-title">Update Ticket</div>
+                <label>Ticket ID: <input type="number" name="id" required></label>
+                <label>Type: <input type="text" name="type"></label>
+                <label>Price: <input type="number" name="price"></label>
+                <label>Quantity: <input type="number" name="quantity"></label>
+                <button type="submit">Update Ticket</button>
+                <div class="response" id="update-ticket-response"></div>
+            </form>
+            <form id="delete-ticket-form">
+                <div class="section-title">Delete Ticket</div>
+                <label>Ticket ID: <input type="number" name="id" required></label>
+                <button type="submit">Delete Ticket</button>
+                <div class="response" id="delete-ticket-response"></div>
+            </form>
+        </div>
+        <div class="card" id="booking-section">
+            <h2>Bookings (Customer)</h2>
+            <form id="create-booking-form">
+                <div class="section-title">Book Ticket</div>
+                <label>Ticket ID: <input type="number" name="id" required></label>
+                <button type="submit">Book Ticket</button>
+                <div class="response" id="create-booking-response"></div>
+            </form>
+            <form id="get-bookings-form">
+                <div class="section-title">Get My Bookings</div>
+                <button type="submit">Fetch Bookings</button>
+                <div class="response" id="get-bookings-response"></div>
+            </form>
+            <form id="cancel-booking-form">
+                <div class="section-title">Cancel Booking</div>
+                <label>Booking ID: <input type="number" name="id" required></label>
+                <button type="submit">Cancel Booking</button>
+                <div class="response" id="cancel-booking-response"></div>
+            </form>
+        </div>
+        <div class="card" id="payment-section">
+            <h2>Payments</h2>
+            <form id="make-payment-form">
+                <div class="section-title">Make Payment</div>
+                <label>Booking ID: <input type="number" name="id" required></label>
+                <label>Amount: <input type="number" name="amount" required></label>
+                <button type="submit">Pay</button>
+                <div class="response" id="make-payment-response"></div>
+            </form>
+            <form id="get-payment-form">
+                <div class="section-title">Get Payment by ID</div>
+                <label>Payment ID: <input type="number" name="id" required></label>
+                <button type="submit">Get Payment</button>
+                <div class="response" id="get-payment-response"></div>
+            </form>
+        </div>
+        <div class="token-bar">
+            <label>Current Token: <input type="text" id="api-token"></label>
+            <button onclick="clearToken()">Clear Token</button>
+        </div>
+    </div>
+    <script>
+        // Helper to get/set token
+        function setToken(token) {
+            document.getElementById('api-token').value = token;
+            localStorage.setItem('api-token', token);
+        }
+        function getToken() {
+            return document.getElementById('api-token').value || localStorage.getItem('api-token') || '';
+        }
+        function clearToken() {
+            setToken('');
+        }
+        document.getElementById('api-token').value = localStorage.getItem('api-token') || '';
+
+        // Helper to handle fetch
+        async function apiFetch(url, options = {}) {
+            options.headers = options.headers || {};
+            if (getToken()) {
+                options.headers['Authorization'] = 'Bearer ' + getToken();
+            }
+            options.headers['Accept'] = 'application/json';
+            if (!(options.body instanceof FormData)) {
+                options.headers['Content-Type'] = 'application/json';
+            }
+            const res = await fetch(url, options);
+            let data;
+            try { data = await res.json(); } catch { data = await res.text(); }
+            return { status: res.status, data };
+        }
+
+        // Register
+        document.getElementById('register-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const body = {
+                email: form.email.value,
+                password: form.password.value,
+                name: form.name.value
+            };
+            const res = await apiFetch('/api/register', { method: 'POST', body: JSON.stringify(body) });
+            document.getElementById('register-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Login
+        document.getElementById('login-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const body = {
+                email: form.email.value,
+                password: form.password.value
+            };
+            const res = await apiFetch('/api/login', { method: 'POST', body: JSON.stringify(body) });
+            document.getElementById('login-response').textContent = JSON.stringify(res, null, 2);
+            if (res.data && res.data.token) setToken(res.data.token);
+        };
+        // Logout
+        document.getElementById('logout-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const res = await apiFetch('/api/logout', { method: 'POST' });
+            document.getElementById('logout-response').textContent = JSON.stringify(res, null, 2);
+            clearToken();
+        };
+        // Me
+        document.getElementById('me-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const res = await apiFetch('/api/me');
+            document.getElementById('me-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Get Events
+        document.getElementById('get-events-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const res = await apiFetch('/api/events');
+            document.getElementById('get-events-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Get Event by ID
+        document.getElementById('get-event-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const id = e.target.id.value;
+            const res = await apiFetch('/api/events/' + id);
+            document.getElementById('get-event-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Create Event
+        document.getElementById('create-event-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const body = {
+                title: form.title.value,
+                description: form.description.value,
+                date: form.date.value
+            };
+            const res = await apiFetch('/api/events', { method: 'POST', body: JSON.stringify(body) });
+            document.getElementById('create-event-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Update Event
+        document.getElementById('update-event-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.id.value;
+            const body = {
+                title: form.title.value,
+                description: form.description.value,
+                date: form.date.value
+            };
+            const res = await apiFetch('/api/events/' + id, { method: 'PUT', body: JSON.stringify(body) });
+            document.getElementById('update-event-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Delete Event
+        document.getElementById('delete-event-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const id = e.target.id.value;
+            const res = await apiFetch('/api/events/' + id, { method: 'DELETE' });
+            document.getElementById('delete-event-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Create Ticket
+        document.getElementById('create-ticket-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const body = {
+                type: form.type.value,
+                price: form.price.value,
+                quantity: form.quantity.value
+            };
+            const event_id = form.event_id.value;
+            const res = await apiFetch('/api/events/' + event_id + '/tickets', { method: 'POST', body: JSON.stringify(body) });
+            document.getElementById('create-ticket-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Update Ticket
+        document.getElementById('update-ticket-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.id.value;
+            const body = {
+                type: form.type.value,
+                price: form.price.value,
+                quantity: form.quantity.value
+            };
+            const res = await apiFetch('/api/tickets/' + id, { method: 'PUT', body: JSON.stringify(body) });
+            document.getElementById('update-ticket-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Delete Ticket
+        document.getElementById('delete-ticket-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const id = e.target.id.value;
+            const res = await apiFetch('/api/tickets/' + id, { method: 'DELETE' });
+            document.getElementById('delete-ticket-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Book Ticket
+        document.getElementById('create-booking-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const id = e.target.id.value;
+            const res = await apiFetch('/api/tickets/' + id + '/bookings', { method: 'POST' });
+            document.getElementById('create-booking-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Get Bookings
+        document.getElementById('get-bookings-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const res = await apiFetch('/api/bookings');
+            document.getElementById('get-bookings-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Cancel Booking
+        document.getElementById('cancel-booking-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const id = e.target.id.value;
+            const res = await apiFetch('/api/bookings/' + id + '/cancel', { method: 'PUT' });
+            document.getElementById('cancel-booking-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Make Payment
+        document.getElementById('make-payment-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.id.value;
+            const body = { amount: form.amount.value };
+            const res = await apiFetch('/api/bookings/' + id + '/payment', { method: 'POST', body: JSON.stringify(body) });
+            document.getElementById('make-payment-response').textContent = JSON.stringify(res, null, 2);
+        };
+        // Get Payment
+        document.getElementById('get-payment-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const id = e.target.id.value;
+            const res = await apiFetch('/api/payments/' + id);
+            document.getElementById('get-payment-response').textContent = JSON.stringify(res, null, 2);
+        };
+    </script>
+</body>
+</html>
